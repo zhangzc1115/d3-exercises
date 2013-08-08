@@ -296,7 +296,7 @@ $(document).ready(function(){
 				return h2 - yScale(d[0])-2;
 			});
 
-		d3.select("#sortVar").html("the " + order[sortOrder])
+		d3.select("#update").html("This is currently being sorted by the " + order[sortOrder] + " variable.")
 	};
 
 });
