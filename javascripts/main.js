@@ -146,7 +146,7 @@ $(document).ready(function(){
 	   .attr("fill", "red");
 
 	//when p tag is clicked
-	d3.select("p")
+	d3.select("#scale")
 		.on("click", function() {
 			pCount = pCount + 1;
 
@@ -296,7 +296,7 @@ $(document).ready(function(){
 				return h2 - yScale(d[0])-2;
 			});
 
-		d3.select("#ex2").selectAll("p").html("This is being sorted by the " + order[sortOrder] + " variable.")
+		d3.select("#ex2").append("p").html("This is being sorted by the " + order[sortOrder] + " variable.")
 	};
 
 });
