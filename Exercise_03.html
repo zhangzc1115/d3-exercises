@@ -1,0 +1,563 @@
+<!-- 
+TO DO:
+scale down 2nd/3rd variable swap
+- divide by max to get a value of 1
+
+ -->
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: Total Student Membership, Total Staff, and Student/Teacher Ratio in the US</title>
+		<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
+		<script type="text/javascript" src="js/d3.min.js"></script>		
+		<script type='text/javascript' src='js/jquery.tipsy.js'></script>
+		<link rel="stylesheet" href="css/tipsy.css" type="text/css" />		
+		<link rel="stylesheet" href="css/style.css" type="text/css" />
+	</head>
+	<body>
+		<h2>School year 2006–07</h2>		
+		<h1>Pre-K-12 Total Student Membership, Total Staff, and Student/Teacher Ratio in the US</h1>
+		<div id="map"></div>		
+		<div id="key">
+			<div class="block" id="color"><div id="purple"></div> <p>Total Student Membership</p></div>
+			<div class="block" id="size"><svg width="20px" height="20px" xmlns="http://www.w3.org/2000/svg" version="1.1"><circle cx="10" cy="10" r="8"></svg> <p>Total Staff</p></div>
+			<div class="block" id="opacity"><svg width="20px" height="20px" xmlns="http://www.w3.org/2000/svg" version="1.1"><circle cx="10" cy="10" r="8"></svg> <p>Student/Teacher Ratio</p></div>
+		</div>
+		<div class="cf"><button id="swap">Swap Me!</button></div>
+
+		<div id="bar"></div>
+
+		<div id="footnotes">
+			<ol>
+				<li>Total teachers include prekindergarten, kindergarten, elementary, secondary, and teachers of ungraded classes.</li>
+				<li>State membership totals in California, Kentucky, and Nevada include imputed values for one grade. In the District of Columbia, Hawaii, New Jersey, Tennessee, and Texas, one or more reported values was changed to the sum of grade detail derived from the State Nonfiscal or School Universe surveys.</li>
+			</ol>
+
+			<p>NOTE: All staff counts are full-time-equivalent (FTE) counts. Some staff counts were imputed based on current-year data. Some staff counts were adjusted or disaggregated from reported totals. See table 3 for more information.</p>
+			<p>SOURCE: U.S. Department of Education, National Center for Education Statistics, Common Core of Data (CCD), "State Nonfiscal Survey of Public Elementary/Secondary Education," 2006–07, Version 1a. <a href="http://nces.ed.gov/ccd/tables/2009305_04.asp" target="_blank">LINK</a></p>
+		</div>
+		<script type="text/javascript">
+			// dataset: http://nces.ed.gov/ccd/tables/2009305_04.asp
+			// Table 4.  Total student membership, total staff, student/teacher ratio, and student/staff ratio for public elementary/secondary education, by teacher and staff category and state or jurisdiction: School year 2006–07
+			// Variables used: total student membership, total staff, student/teacher ratio
+
+			// Exercise 3
+
+			// Create map display for the US states that visualizes three data variables:
+
+			// Use the shape files for the states to create a "area map" or "choropleth map" where a state's area shape is colored based on the value of the 1st data variable (select color and vary saturation or opacity value);
+
+			// Find the geo-code of the center of a state's area shape or find the state capitol's geo-code, whichever is easier.
+			// Create "size map" where the size of the circle is proportional to the value of 2nd variable and position it at the center of a state's area shape or at the state's capitol.
+
+			// Create two proportionally sized circles at a given location so that the larger white or black circle sits below the 2nd smaller circle: we want to create white or black surround (or border effect) so that there is sufficient contrast between colored area of the smaller circle and "surround" circle and the color of state's area.
+
+			// The color opacity of the smaller circle is based on the value of the third variable.
+
+			// Add "swapping capability" of the data variables so that clicking in p tag or a button causes the the state's area to be colored based on the 2nd variable and the size of the bubble and its color is based on the 3rd and 1st variables, respectively. On the next click, the 3rd variable is used for state's area color etc. In short, clicking on the p tag or button let's the user "cycle through" the variables used for area color, bubble size and color.
+
+			// Add transition effects when the user performs a swapping operation.
+
+			// Create a bar chart, as in Ex2, that displays the three data variables (and is placed below the map):
+
+			// Add ordinal xScale and linear yScale
+
+			// Add x and y axes (optional)
+
+			// Add hover effect for bar so that fill color is changed to red using CSS rule
+
+			// Add sort capabilities when clicking on bar so that user can sequentially sort by the 1st, 2nd and 3rd variable, respectively and make sure that text label shows value of variable currently used to sort the bar chart.
+
+			// The text label has to be shown in red and needs to be placed at the top of the bar, be left-aligned and fully visible as well as maintain its position with respect to the top of a bar as the bar chart is sorted.
+
+			// Add transition effects when the user performs a sorting operation.
+
+			//Width and height
+			var w = 960;
+			var h = 500;
+			var count = 0;
+			var swapOrder=["Total Student Membership","Total Staff","Student/Teacher Ratio"];
+
+
+			//Define map projection
+			var projection = d3.geo.albersUsa();
+
+			//Define path generator
+			var path = d3.geo.path()
+						.projection(projection);
+
+		   	//Create the SVG graph.
+		   	var svg = d3.select("#map")
+		   				.append("svg")
+		   				.attr("width", w)
+		   				.attr("height", h);
+
+			//Load data
+			d3.csv("states.csv", function(data) {
+			    
+			//Load in GeoJSON data
+			d3.json("us-states.json", function (json) {
+					//Merge data and GeoJSON
+					//Loop through for student variable
+					for (var i = 0; i < data.length; i++) {
+
+						//Grab state name
+						var dataState = data[i].state;
+
+						//Grab data value, and convert from string to float
+						var students = parseFloat(data[i].students);
+						var staff = parseFloat(data[i].staff);						
+						var ratio = parseFloat(data[i].ratio);
+
+						//Find the corresponding state inside the GeoJSON
+						for (var j = 0; j < json.features.length; j++) {
+
+							var jsonState = json.features[j].properties.name;
+
+							if (dataState == jsonState) {
+
+								//Copy the data value into the JSON
+								json.features[j].properties.students = students;
+								json.features[j].properties.staff = staff;
+								json.features[j].properties.ratio = ratio;
+
+
+								//Stop looking through the JSON
+								break;
+
+							}
+						}	
+					}
+
+					//Bind data and create one path per GeoJSON feature
+					svg.selectAll("path")
+					   .data(json.features)
+					   .enter()
+					   .append("path")
+					   .attr("class", "states")
+					   .attr("d", path)
+					   .style("fill", "#393b79")
+					   .attr("opacity", function(d) {
+							//Get data value
+					   		var value = d.properties.students;
+
+					   		if (value) {
+					   			//If value exists…
+						   		return (value* .00000075) + .25;
+					   		} else {
+					   			//If value is undefined…
+						   		return "0";
+					   		}
+					  	})
+					    .attr("title", function(d) { 
+                    		return d.properties.name;
+                    	});
+
+                    	$("path").tipsy({
+                    		className: "left",                    		
+                    		gravity:'s'
+                    	});
+
+						svg.selectAll("circle")
+						.data(data)
+						.enter()
+						.append("circle")
+						.attr("cx", function(d) {
+							return projection([d.lon, d.lat])[0];
+						})
+						.attr("cy", function(d) {
+							return projection([d.lon, d.lat])[1];
+						})
+						.attr("r", function(d) {
+							return Math.sqrt(d.staff * .002);
+						})
+						.style("fill", "yellow")
+						.style("opacity", function(d) {
+							return d.ratio*.05;
+						});
+
+				}); // JSON load end
+
+			//when swap button is clicked
+			d3.select('button') 
+				.on("click", function() {
+	   				count += 1;
+	   				swapVal();
+				});
+
+			//check for circle clicks
+			var swapVal = function() {
+
+				if (count == 1) {
+					svg.selectAll("path")
+						.transition()
+						.delay(function(d, i) {
+							return i / data.length * 1000;
+						})
+						.duration(750)
+						.ease("linear")
+						.style("fill", "#393b79")
+						.attr("opacity", function(d) {	
+							var staff = d.properties.staff;				
+						   	return staff * .000005 + .25;
+						});
+
+					svg.selectAll("circle")
+						.transition()
+						.delay(function(d, i) {
+							return i / data.length * 1000;
+						})
+						.duration(750)
+						.ease("linear")
+						.attr("r", function(d) {
+							//3rd variable
+							return d.ratio;
+						})						
+						.style("opacity", function(d) {
+							//1st variable
+							return (d.students*.00000075) + .25;
+						});
+						// .attr("title", function(d) { 
+      //               		return "Ratio: " + d.ratio;
+      //               	});
+
+      //               	$("circle").tipsy({
+      //               		className: "left",                    		
+      //               		html:true,
+      //               		gravity:'w'
+      //               	});
+
+				//update key
+				d3.select("#color").selectAll("p").html(swapOrder[1]);
+				d3.select("#size").selectAll("p").html(swapOrder[2]);
+				d3.select("#opacity").selectAll("p").html(swapOrder[0]);
+
+				}
+
+				else if (count == 2) {
+					svg.selectAll("path")
+						.transition()
+						.delay(function(d, i) {
+							return i / data.length * 1000;
+						})
+						.duration(750)
+						.ease("linear")
+						.attr("opacity", function(d) {
+							var ratio = d.properties.ratio;				
+
+							return ratio *.04 + .25;
+						});
+
+					svg.selectAll("circle")
+						.transition()
+						.delay(function(d, i) {
+							return i / data.length * 1000;
+						})
+						.duration(750)
+						.ease("linear")
+						.attr("r", function(d) {
+							//1st variable
+							return (d.students*.0000075) + .25;
+						})
+						.style("opacity", function(d) {
+							//2nd variable
+							return d.staff * .000005 + .25;
+						});
+					    // .attr("title", function(d) { 
+         //            		return "Students: " + d.staff;
+         //            	});
+
+         //            	$("circle").tipsy({
+         //            		className: "left",                    		
+         //            		html:true,
+         //            		gravity:'w'
+         //            	});
+					d3.select("#color").selectAll("p").html(swapOrder[2]);
+					d3.select("#size").selectAll("p").html(swapOrder[0]);
+					d3.select("#opacity").selectAll("p").html(swapOrder[1]);
+
+				}
+
+				// return back to first state
+				else if (count == 3) {
+					svg.selectAll("path")
+						.transition()
+						.delay(function(d, i) {
+							return i / data.length * 1000;
+						})
+						.duration(750)
+						.ease("linear")
+						.attr("opacity", function(d) {
+							//1st variable
+					   		var students = d.properties.students;
+
+					   		if (students) {
+					   			//If value exists…
+						   		return (students* .00000075) + .25;
+					   		} else {
+					   			//If value is undefined…
+						   		return "0";
+					   		}
+						});
+
+					svg.selectAll("circle")
+						.transition()
+						.delay(function(d, i) {
+							return i / data.length * 1000;
+						})
+						.duration(750)
+						.ease("linear")
+						.attr("r", function(d) {
+							//2nd variable
+							return Math.sqrt(d.staff * .002);
+						})
+						.style("opacity", function(d) {
+							//3rd variable
+							return d.ratio*.05;
+						});
+					    // .attr("title", function(d) { 
+         //            		return "Staff: " + d.staff;
+         //            	});
+
+         //            	$("circle").tipsy({
+         //            		className: "left",                    		
+         //            		html:true,
+         //            		gravity:'w'
+         //            	});
+
+					d3.select("#color").selectAll("p").html(swapOrder[0]);
+					d3.select("#size").selectAll("p").html(swapOrder[1]);
+					d3.select("#opacity").selectAll("p").html(swapOrder[2]);
+
+					//reset count
+					count = 0;
+				}
+			}; // swapVal ends
+
+				// still inside total students csv load 
+				// bar chart start
+
+				var margin = {top: 10, right: 0, bottom: 20, left: 0},		
+					barW = 1440 - margin.left - margin.right,
+    				barH = 800 - margin.top - margin.bottom;
+
+				var sortCount = 0;
+
+				//reformat data variables
+				data.forEach(function(d) {
+				    d.students = +d.students;
+				    d.staff = +d.staff;
+				    d.ratio = +d.ratio;
+				});
+
+				var xScale = d3.scale.ordinal()
+								.domain(data.map(function(d) { return d.abbr; }))
+								.rangeRoundBands([ 0, barW], 0.5);								
+				var yScale = d3.scale.linear()
+								.domain([0, d3.max(data, function(d) { return d.students; })])
+								.range([0, barH])
+								.nice();
+
+				//Define X axis
+				var xAxis = d3.svg.axis()
+								  .scale(xScale)
+								  .orient("bottom")
+
+				var barChart = d3.select("#bar")
+							.append("svg")
+							.attr("width", barW + margin.left + margin.right)
+    						.attr("height", barH + margin.top + margin.bottom)
+  							.append("g")
+    						.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+				//Create bars
+				barChart.selectAll("rect")
+				   .data(data)
+				   .enter()
+				   .append("rect")
+				   .attr("x", function(d) {
+				   		return xScale(d.abbr);
+				   })
+				   .attr("y", function(d) {
+				   		return barH - yScale(d.students);
+				   })
+
+				   .attr("width", function(d) {
+			   		return xScale.rangeBand() * (d.ratio / 50);			   
+			   		})			   
+
+				   .attr("height", function(d) {
+				   		return yScale(d.students);
+				   })
+				   .attr("title", function(d) { 
+                    	return d.state;
+                   })                   
+				   .attr("fill", "steelblue")
+
+				   .attr("fill-opacity", function(d) {
+						return (d.staff * .00075) / 100 + .25;
+				   })
+					// when bar is clicked
+				   .on("click", function() {
+				   		sortCount += 1;
+				   		sortBars();
+				});
+
+            	// $("rect").tipsy({
+            	// 	className: "left",                    		
+            	// 	gravity:'w'
+            	// });
+
+				barChart.selectAll("text")
+				   .data(data)
+				   .enter()
+				   .append("text")
+				   .text(function(d) {
+				   		return d.students;
+				   })
+				   .attr("text-anchor", "left")
+				   .attr("x", function(d) {
+						return xScale(d.abbr);
+				   })
+				   .attr("y", function(d) {
+				   		return barH - yScale(d.students)-4;
+				   })
+				   .attr("font-family", "Open Sans")
+				   .attr("font-size", "8px")
+				   .style("text-rendering", "optimizeLegibility")
+				   .attr("fill", "red");			
+
+				//Create X axis
+				barChart.append("g")
+					.attr("class", "x axis")
+					.attr("transform", "translate(0," + barH + ")")
+					.call(xAxis);
+
+				//when bar is clicked, sort bars
+				var sortBars = function() {					
+
+					if (sortCount == 1) {
+						var x = xScale.domain(data.sort(function(a, b) { return d3.ascending(a.students, b.students); })
+	        				.map(function(d) { return d.abbr; }))
+	        				.copy();
+
+						yScale.domain([0, d3.max(data, function(d) { return d.students; })]);
+
+						barChart.selectAll("rect")							
+							.transition()
+							.delay(function(d, i) {
+								return i / data.length * 1000;
+							})
+							.duration(750)
+							.attr("x", function(d) {
+								return x(d.abbr);
+							})
+
+						//Update all labels
+						barChart.selectAll("text")
+							
+							.transition()
+							.delay(function(d, i) {
+								return i / data.length * 1000;
+							})
+							.duration(750)				
+							.text(function(d) {
+								return d.students;
+							})
+							.attr("x", function(d) {
+								return x(d.abbr);
+							})
+								
+						//Update X axis
+						barChart.select(".x.axis")
+					    	.transition()
+					    	.duration(750)
+							.call(xAxis);
+
+					}
+
+					else if (sortCount == 2) {
+						var x = xScale.domain(data.sort(function(a, b) { return d3.ascending(a.staff, b.staff); })
+	        				.map(function(d) { return d.abbr; }))
+	        				.copy();
+
+						//Update all rects
+						barChart.selectAll("rect")
+							.transition()
+							.delay(function(d, i) {
+								return i / data.length * 1000;
+							})
+							.duration(750)
+							.attr("x", function(d, i) {
+								return x(d.abbr);
+							})
+
+						//Update all labels
+						barChart.selectAll("text")
+							.transition()
+							.delay(function(d, i) {
+								return i / data.length * 1000;
+							})
+							.duration(750)
+							.text(function(d) {
+								return d.staff;
+							})
+							.attr("x", function(d) {
+								return x(d.abbr);
+							})
+
+							//Update X axis
+							barChart.select(".x.axis")
+						    	.transition()
+						    	.duration(750)
+								.call(xAxis);
+					}
+
+					else {
+						var x = xScale.domain(data.sort(function(a, b) { return d3.ascending(a.ratio, b.ratio); })
+	        				.map(function(d) { return d.abbr; }))
+	        				.copy();
+
+						//Update all rects
+						barChart.selectAll("rect")
+							.transition()
+							.delay(function(d, i) {
+								return i / data.length * 1000;
+							})
+							.duration(750)
+							.attr("x", function(d) {
+								return x(d.abbr);
+							})
+
+						//Update all labels
+						barChart.selectAll("text")
+							.transition()
+							.delay(function(d, i) {
+								return i / data.length * 1000;
+							})
+							.duration(750)
+							.text(function(d) {
+								return d.ratio;
+							})
+							.attr("x", function(d, i) {
+								return x(d.abbr);
+							})
+
+						//Update X axis
+						barChart.select(".x.axis")
+					    	.transition()
+					    	.duration(750)
+							.call(xAxis);
+
+						//reset count
+						sortCount = 0;
+					}
+				}; // sortBars ends			
+		});	// states csv ends
+
+		</script>
+	</body>
+</html>

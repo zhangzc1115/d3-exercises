@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: Exercise 2</title>
+		<script type="text/javascript" src="js/d3.min.js"></script>
+		<style type="text/css">
+			html {
+				margin-left:20px;
+			}
+			rect:hover {
+				fill: red;
+			}	
+			svg text {
+				pointer-events: none;
+			}
+			#update {
+				color: #676767;
+			}
+		</style>
+	</head>
+	<body>
+	<p>Click on this text to scale the height of the chart.</p>
+		<script type="text/javascript">
+
+			// Exercise 2
+
+			// As in Ex1, d[0] = height of bar.
+			// 			  d[1] = to scale width of bar.
+			// 			  d[2] = to control fill-opacity of bar.
+			
+			// Add sort capabilities when clicking on bar so that user can sequentially sort by the 1st, 2nd and 3rd variable, respectively (hint: use  Modulus (division remainder) operator) and make sure that text label shows value of variable currently used to sort the bar chart.
+
+			// Chapter 10 has an example where user can click on a bar to sort the bar chart.
+
+			// When using ascending(a, b), keep in mind that a and b are arrays and you need to specify which variable to use in the sort operation.
+
+			// To be able to "cycle through" the different variables when successively clicking on one of the bars use the Modulus (division remainder) operator in JavaScript to specify which variable to sort by.
+
+			// Add scaling capabilities so that height of the bars is scaled by 1/3, 2/3 and 1, respectively, by successively clicking on a paragraph above the chart.
+
+			// Chapter 9 has example where clicking on a paragraph changes the bar chart.
+
+			// Modulus (division remainder) operator in JavaScript could be useful to employ.
+
+			// The text label has to be shown in red and needs to be placed at the top of the bar, be left-aligned and fully visible as well as maintain its position with respect to the top of a bar as the bar chart is sorted and/or scaled .
+
+			// Chapter 10 contains example that show how to update position of text labels.
+
+			// Add transition effects when the user performs a sorting and/or scaling operation.
+
+			// Use a delay function as specified on page 153 in Chapter 9 for all transitions.
+
+
+			//Width and height
+			var w = 500;
+			var h = 250;
+			var pCount = 0;
+			var sortCount = 0;
+			var sortOrder = 0;
+			var sorted = false;
+
+			var padding = 10;
+
+			var dataset = [ [5, 23, 75], [10, 14, 34], [13, 67, 23], [19, 10, 65], [21, 42, 29], [25, 25, 25], [22, 90, 30], [18, 57, 17], [15, 25, 35], [13, 26, 39], [11, 17, 85], [12, 36, 24], [15, 60, 45], [20, 41, 11], [18, 77, 33], [17, 85, 55], [16, 23, 44], [18, 35, 23], [23, 55, 15], [25, 45, 100] ];
+
+			var order=["1st","2nd","3rd"];
+
+			var xScale = d3.scale.ordinal()
+							//sort in the range of dataset.length
+							//domain sets the new ordinal scale
+							.domain(d3.range(dataset.length))
+							.rangeRoundBands([padding, w - padding], 0.05);
+
+			var yScale = d3.scale.linear()
+							.domain([0, d3.max(dataset, function(d) { return d[0]; })])
+							.range([padding, h - padding]);
+
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h);
+
+			//Create bars
+			svg.selectAll("rect")
+			   .data(dataset)
+			   .enter()
+			   .append("rect")
+			   .attr("x", function(d, i) {
+			   		return xScale(i);
+			   })
+			   .attr("y", function(d) {
+			   		return h - yScale(d[0]);
+			   })
+
+			   // second variable = scale width of bar
+			   .attr("width", function(d) {
+			   		return xScale.rangeBand() * (d[1] / 100);			   
+			   })
+
+			   // first variable = height of bar
+			   .attr("height", function(d) {
+			   		return yScale(d[0]);
+			   })
+
+			   //set color to (0, 0, 200)
+			   .attr("fill", function(d) {
+					return "rgb(0, 0, " + 200 + ")";
+			   })
+
+			   // third variable = scales with fill-opacity
+			   .attr("fill-opacity", function(d) {
+					return (d[2] * .75) / 100 + .25;
+			   })
+
+			   .on("click", function() {
+			   		sortCount += 1;
+			   		sortBars();
+			});
+
+			svg.selectAll("text")
+			   .data(dataset)
+			   .enter()
+			   .append("text")
+			   .text(function(d) {
+			   		return d[0];
+			   })
+			   .attr("text-anchor", "left")
+			   .attr("x", function(d, i) {
+					return xScale(i);
+			   })
+			   .attr("y", function(d) {
+			   		return h - yScale(d[0])-2;
+			   })
+			   .attr("font-family", "sans-serif")
+			   .attr("font-size", "11px")
+			   .attr("fill", "red");
+
+			//when p tag is clicked
+			d3.select("p")
+				.on("click", function() {
+					pCount = pCount + 1;
+
+					if (pCount == 1) {
+						yScale.domain([0, d3.max(dataset, function(d) { return d[0] * 3; })])
+					}
+
+					else if (pCount == 2) {
+						yScale.domain([0, d3.max(dataset, function(d) { return d[0] * 3/2; })])
+					}
+
+					else if (pCount == 3) {
+						yScale.domain([0, d3.max(dataset, function(d) { return d[0]; })])
+						pCount = 0;
+					}
+
+					//Update all rects
+					svg.selectAll("rect")
+						.transition()
+						.delay(function(d, i) {
+							return i / dataset.length * 1000;
+						})
+						.duration(500)
+						.ease("linear")
+						.attr("y", function(d) {
+							return h - yScale(d[0]);
+						})
+
+						.attr("height", function(d) {
+							return yScale(d[0]);
+						})
+
+					//check if sorted
+					if (sorted) {
+						svg.selectAll("text")
+							.sort(function(a, b) {
+								return d3.ascending(a[sortOrder], b[sortOrder]);
+							})
+							.transition()
+							.delay(function(d, i) {
+								return i / dataset.length * 1000;
+							})
+							.duration(500)
+							.ease("linear")
+							.text(function(d) {
+								return d[sortOrder];
+							})
+							.attr("x", function(d, i) {
+								return xScale(i);
+							})
+							.attr("y", function(d) {
+								return h - yScale(d[0])-2;
+							});
+					}
+
+
+					else {
+						//Update all labels
+						svg.selectAll("text")
+							.transition()
+							.delay(function(d, i) {
+								return i / dataset.length * 1000;
+							})
+							.duration(500)
+							.ease("linear")
+							.text(function(d) {
+								return d[sortOrder];
+							})					
+							.attr("x", function(d, i) {
+								return xScale(i);
+							})
+							.attr("y", function(d) {
+								return h - yScale(d[0])-2;
+							});
+						}
+				});
+
+			//when bar is clicked, sort bars
+			var sortBars = function() {
+				sorted = true;
+
+				//check state of scale
+				if (pCount == 1) {
+					yScale.domain([0, d3.max(dataset, function(d) { return d[0] * 3; })])				
+				}
+
+				else if (pCount == 2) {
+					yScale.domain([0, d3.max(dataset, function(d) { return d[0] * 3/2; })])
+				}
+
+				else if (pCount == 3) {
+					yScale.domain([0, d3.max(dataset, function(d) { return d[0]; })])
+					pCount = 0;
+				}
+
+				if (sortCount == 1) {
+					sortOrder = 0;
+				}
+
+				if (sortCount > 1) {
+					sortOrder += 1;
+					if (sortOrder == 3) {
+						sortOrder = 0;
+					}
+				}
+
+				//Update all rects
+				svg.selectAll("rect")
+					.sort(function(a, b) {
+						return d3.ascending(a[sortOrder], b[sortOrder]);
+					})
+					.transition()
+					.delay(function(d, i) {
+						return i / dataset.length * 1000;
+					})
+					.duration(500)
+					.ease("linear")
+					.attr("x", function(d, i) {
+						return xScale(i);
+					})
+					.attr("y", function(d) {
+						return h - yScale(d[0]);
+					})
+
+					.attr("height", function(d) {
+						return yScale(d[0]);
+					})
+
+				//Update all labels
+				svg.selectAll("text")
+					.sort(function(a, b) {
+						return d3.ascending(a[sortOrder], b[sortOrder]);
+					})
+					.transition()
+					.delay(function(d, i) {
+						return i / dataset.length * 1000;
+					})
+					.duration(500)
+					.ease("linear")
+					.text(function(d) {
+						return d[sortOrder];
+					})
+					.attr("x", function(d, i) {
+						return xScale(i);
+					})
+					.attr("y", function(d) {
+						return h - yScale(d[0])-2;
+					});
+
+				d3.select("div").selectAll("p").remove();
+				d3.select("div").append("p").html("This is being sorted by the " + order[sortOrder] + " variable.")
+			};
+
+		</script>
+		<div id="update"></div>
+	</body>
+</html>
