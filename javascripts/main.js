@@ -1,5 +1,5 @@
 // Exercise 1
-
+$(document).ready(function(){
 var w = 500;
 var h = 120;
 
@@ -60,3 +60,4 @@ svg.selectAll("text")
    .attr("font-family", "sans-serif")
    .attr("font-size", "11px")
    .attr("fill", "red");
+});
