@@ -100,6 +100,6 @@ Create "size map" where the size of the circle is proportional to the value of 2
 
 * Add transition effects when the user performs a sorting operation.
 
-In my code, I used this dataset: http://nces.ed.gov/ccd/tables/2009305_04.asp to visualize the  Pre-K-12 Total Student Membership, Total Staff, and Student/Teacher Ratio in the US (school year 2006-2007). I also added a few extra touches to the map such as using tipsy to bring up the state's name in tooltips on hover over a state and swapping the labels when the "Swap Me!" button is clicked.
+I used this dataset: http://nces.ed.gov/ccd/tables/2009305_04.asp to visualize the Pre-K-12 Total Student Membership, Total Staff, and Student/Teacher Ratio in the US (school year 2006-2007). I also added a few extra touches to the map such as using tipsy to bring up the state's name in tooltips on hover over a state and swapping the labels when the "Swap Me!" button is clicked.
 
 Lastly, I was told that the data showing up on top of the bars in the bar chart do not need to be completely visible for the purpose of this exercise.
