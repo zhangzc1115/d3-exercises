@@ -1,5 +1,8 @@
-// Exercise 1
 $(document).ready(function(){
+////
+//// Exercise 1
+////
+
 	var w = 500;
 	var h = 120;
 
@@ -61,8 +64,9 @@ $(document).ready(function(){
 	   .attr("font-size", "11px")
 	   .attr("fill", "red");
 
-
-	// Exercise 2
+////
+//// Exercise 2
+////
 
 	var w2 = 500;
 	var h2 = 250;
@@ -298,5 +302,245 @@ $(document).ready(function(){
 
 		d3.select("#update").html("This is currently being sorted by the " + order[sortOrder] + " variable.")
 	};
+
+////
+//// Exercise 3
+////
+
+	var w3 = 960;
+	var h3 = 500;
+	var count = 0;
+	var swapOrder=["Total Student Membership","Total Staff","Student/Teacher Ratio"];
+
+
+	//Define map projection
+	var projection = d3.geo.albersUsa();
+
+	//Define path generator
+	var path = d3.geo.path()
+				.projection(projection);
+
+   	//Create the SVG graph.
+   	var svg = d3.select("#map")
+   				.append("svg")
+   				.attr("width", w3)
+   				.attr("height", h3);
+
+	//Load data
+	d3.csv("states.csv", function(data) {
+	    
+	//Load in GeoJSON data
+	d3.json("us-states.json", function (json) {
+			//Merge data and GeoJSON
+			//Loop through for student variable
+			for (var i = 0; i < data.length; i++) {
+
+				//Grab state name
+				var dataState = data[i].state;
+
+				//Grab data value, and convert from string to float
+				var students = parseFloat(data[i].students);
+				var staff = parseFloat(data[i].staff);						
+				var ratio = parseFloat(data[i].ratio);
+
+				//Find the corresponding state inside the GeoJSON
+				for (var j = 0; j < json.features.length; j++) {
+
+					var jsonState = json.features[j].properties.name;
+
+					if (dataState == jsonState) {
+
+						//Copy the data value into the JSON
+						json.features[j].properties.students = students;
+						json.features[j].properties.staff = staff;
+						json.features[j].properties.ratio = ratio;
+
+
+						//Stop looking through the JSON
+						break;
+
+					}
+				}	
+			}
+
+			//Bind data and create one path per GeoJSON feature
+			svg.selectAll("path")
+			   .data(json.features)
+			   .enter()
+			   .append("path")
+			   .attr("class", "states")
+			   .attr("d", path)
+			   .style("fill", "#393b79")
+			   .attr("opacity", function(d) {
+					//Get data value
+			   		var value = d.properties.students;
+
+			   		if (value) {
+			   			//If value exists…
+				   		return (value* .00000075) + .25;
+			   		} else {
+			   			//If value is undefined…
+				   		return "0";
+			   		}
+			  	})
+			    .attr("title", function(d) { 
+            		return d.properties.name;
+            	});
+
+            	$("path").tipsy({
+            		className: "left",                    		
+            		gravity:'s'
+            	});
+
+				svg.selectAll("circle")
+				.data(data)
+				.enter()
+				.append("circle")
+				.attr("cx", function(d) {
+					return projection([d.lon, d.lat])[0];
+				})
+				.attr("cy", function(d) {
+					return projection([d.lon, d.lat])[1];
+				})
+				.attr("r", function(d) {
+					return Math.sqrt(d.staff * .002);
+				})
+				.style("fill", "yellow")
+				.style("opacity", function(d) {
+					return d.ratio*.05;
+				});
+
+		}); // JSON load end
+
+	//when swap button is clicked
+	d3.select('button') 
+		.on("click", function() {
+				count += 1;
+				swapVal();
+		});
+
+	//check for circle clicks
+	var swapVal = function() {
+
+		if (count == 1) {
+			svg.selectAll("path")
+				.transition()
+				.delay(function(d, i) {
+					return i / data.length * 1000;
+				})
+				.duration(750)
+				.ease("linear")
+				.style("fill", "#393b79")
+				.attr("opacity", function(d) {	
+					var staff = d.properties.staff;				
+				   	return staff * .000005 + .25;
+				});
+
+			svg.selectAll("circle")
+				.transition()
+				.delay(function(d, i) {
+					return i / data.length * 1000;
+				})
+				.duration(750)
+				.ease("linear")
+				.attr("r", function(d) {
+					//3rd variable
+					return d.ratio;
+				})						
+				.style("opacity", function(d) {
+					//1st variable
+					return (d.students*.00000075) + .25;
+				});
+
+		//update key
+		d3.select("#color").selectAll("p").html(swapOrder[1]);
+		d3.select("#size").selectAll("p").html(swapOrder[2]);
+		d3.select("#opacity").selectAll("p").html(swapOrder[0]);
+
+		}
+
+		else if (count == 2) {
+			svg.selectAll("path")
+				.transition()
+				.delay(function(d, i) {
+					return i / data.length * 1000;
+				})
+				.duration(750)
+				.ease("linear")
+				.attr("opacity", function(d) {
+					var ratio = d.properties.ratio;				
+
+					return ratio *.04 + .25;
+				});
+
+			svg.selectAll("circle")
+				.transition()
+				.delay(function(d, i) {
+					return i / data.length * 1000;
+				})
+				.duration(750)
+				.ease("linear")
+				.attr("r", function(d) {
+					//1st variable
+					return (d.students*.0000075) + .25;
+				})
+				.style("opacity", function(d) {
+					//2nd variable
+					return d.staff * .000005 + .25;
+				});
+
+			d3.select("#color").selectAll("p").html(swapOrder[2]);
+			d3.select("#size").selectAll("p").html(swapOrder[0]);
+			d3.select("#opacity").selectAll("p").html(swapOrder[1]);
+
+		}
+
+		// return back to first state
+		else if (count == 3) {
+			svg.selectAll("path")
+				.transition()
+				.delay(function(d, i) {
+					return i / data.length * 1000;
+				})
+				.duration(750)
+				.ease("linear")
+				.attr("opacity", function(d) {
+					//1st variable
+			   		var students = d.properties.students;
+
+			   		if (students) {
+			   			//If value exists…
+				   		return (students* .00000075) + .25;
+			   		} else {
+			   			//If value is undefined…
+				   		return "0";
+			   		}
+				});
+
+			svg.selectAll("circle")
+				.transition()
+				.delay(function(d, i) {
+					return i / data.length * 1000;
+				})
+				.duration(750)
+				.ease("linear")
+				.attr("r", function(d) {
+					//2nd variable
+					return Math.sqrt(d.staff * .002);
+				})
+				.style("opacity", function(d) {
+					//3rd variable
+					return d.ratio*.05;
+				});
+
+			d3.select("#color").selectAll("p").html(swapOrder[0]);
+			d3.select("#size").selectAll("p").html(swapOrder[1]);
+			d3.select("#opacity").selectAll("p").html(swapOrder[2]);
+
+			//reset count
+			count = 0;
+		}
+	}; // swapVal ends
+});	// states csv ends
 
 });
