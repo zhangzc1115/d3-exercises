@@ -89,13 +89,13 @@ $(document).ready(function(){
 					.domain([0, d3.max(dataset2, function(d) { return d[0]; })])
 					.range([padding, h2 - padding]);
 
-	var svg = d3.select("#ex2")
+	var svg2 = d3.select("#ex2")
 				.append("svg")
 				.attr("width", w2)
 				.attr("height", h2);
 
 	//Create bars
-	svg.selectAll("rect")
+	svg2.selectAll("rect")
 	   .data(dataset2)
 	   .enter()
 	   .append("rect")
@@ -131,7 +131,7 @@ $(document).ready(function(){
 	   		sortBars();
 	});
 
-	svg.selectAll("text")
+	svg2.selectAll("text")
 	   .data(dataset2)
 	   .enter()
 	   .append("text")
@@ -168,7 +168,7 @@ $(document).ready(function(){
 			}
 
 			//Update all rects
-			svg.selectAll("rect")
+			svg2.selectAll("rect")
 				.transition()
 				.delay(function(d, i) {
 					return i / dataset2.length * 1000;
@@ -185,7 +185,7 @@ $(document).ready(function(){
 
 			//check if sorted
 			if (sorted) {
-				svg.selectAll("text")
+				svg2.selectAll("text")
 					.sort(function(a, b) {
 						return d3.ascending(a[sortOrder], b[sortOrder]);
 					})
@@ -209,7 +209,7 @@ $(document).ready(function(){
 
 			else {
 				//Update all labels
-				svg.selectAll("text")
+				svg2.selectAll("text")
 					.transition()
 					.delay(function(d, i) {
 						return i / dataset2.length * 1000;
@@ -258,7 +258,7 @@ $(document).ready(function(){
 		}
 
 		//Update all rects
-		svg.selectAll("rect")
+		svg2.selectAll("rect")
 			.sort(function(a, b) {
 				return d3.ascending(a[sortOrder], b[sortOrder]);
 			})
@@ -280,7 +280,7 @@ $(document).ready(function(){
 			})
 
 		//Update all labels
-		svg.selectAll("text")
+		svg2.selectAll("text")
 			.sort(function(a, b) {
 				return d3.ascending(a[sortOrder], b[sortOrder]);
 			})
@@ -321,7 +321,7 @@ $(document).ready(function(){
 				.projection(projection);
 
    	//Create the SVG graph.
-   	var svg = d3.select("#map")
+   	var svg3 = d3.select("#map")
    				.append("svg")
    				.attr("width", w3)
    				.attr("height", h3);
@@ -364,7 +364,7 @@ $(document).ready(function(){
 			}
 
 			//Bind data and create one path per GeoJSON feature
-			svg.selectAll("path")
+			svg3.selectAll("path")
 			   .data(json.features)
 			   .enter()
 			   .append("path")
@@ -392,7 +392,7 @@ $(document).ready(function(){
             		gravity:'s'
             	});
 
-				svg.selectAll("circle")
+				svg3.selectAll("circle")
 				.data(data)
 				.enter()
 				.append("circle")
@@ -423,7 +423,7 @@ $(document).ready(function(){
 	var swapVal = function() {
 
 		if (count == 1) {
-			svg.selectAll("path")
+			svg3.selectAll("path")
 				.transition()
 				.delay(function(d, i) {
 					return i / data.length * 1000;
@@ -436,7 +436,7 @@ $(document).ready(function(){
 				   	return staff * .000005 + .25;
 				});
 
-			svg.selectAll("circle")
+			svg3.selectAll("circle")
 				.transition()
 				.delay(function(d, i) {
 					return i / data.length * 1000;
@@ -460,7 +460,7 @@ $(document).ready(function(){
 		}
 
 		else if (count == 2) {
-			svg.selectAll("path")
+			svg3.selectAll("path")
 				.transition()
 				.delay(function(d, i) {
 					return i / data.length * 1000;
@@ -473,7 +473,7 @@ $(document).ready(function(){
 					return ratio *.04 + .25;
 				});
 
-			svg.selectAll("circle")
+			svg3.selectAll("circle")
 				.transition()
 				.delay(function(d, i) {
 					return i / data.length * 1000;
@@ -497,7 +497,7 @@ $(document).ready(function(){
 
 		// return back to first state
 		else if (count == 3) {
-			svg.selectAll("path")
+			svg3.selectAll("path")
 				.transition()
 				.delay(function(d, i) {
 					return i / data.length * 1000;
@@ -517,7 +517,7 @@ $(document).ready(function(){
 			   		}
 				});
 
-			svg.selectAll("circle")
+			svg3.selectAll("circle")
 				.transition()
 				.delay(function(d, i) {
 					return i / data.length * 1000;
