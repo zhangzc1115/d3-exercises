@@ -1,7 +1,7 @@
 Visualization Programming using d3
 ==============
 
-3 simple exercises of varying degrees of difficulty done for an Information Visualization course. The working exercises are available <a href="http://kaizora.github.io/d3-exercises/">here</a>. Instructions of the exercise are below.
+3 simple exercises of varying degrees of difficulty done for an Information Visualization course using <a href="http://d3js.org/">d3.js</a>. The working exercise solutions are available <a href="http://kaizora.github.io/d3-exercises/">here</a>. Instructions of the exercises are below.
 
 I encourage attempting these exercises without looking at the source code, and instead, read Scott Murray's book, “Interactive Data Visualization for the Web”, and use his <a href="https://github.com/alignedleft/d3-book">examples</a> as a reference.
 
