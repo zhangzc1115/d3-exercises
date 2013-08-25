@@ -513,6 +513,10 @@ Custom Styles
   padding: 7px 14px;
   margin: 10px 0;
 }
+#swap:hover {
+  background-color:#393b79;
+  color:white;
+}
 
 circle {
   stroke:black;
