@@ -515,7 +515,7 @@ Custom Styles
 }
 
 #swap {
-  font-family: 'Open Sans', sans-serif;
+  font-size:14px;
   border: 2px solid #393b79;
   padding: 7px 14px;
   margin: 10px 0;
@@ -529,23 +529,28 @@ Custom Styles
 #swap:hover {
   background-color:#393b79;
   color:white;
+  cursor: pointer;
 }
 
 circle {
   stroke:black;
   stroke-width: 3;
 }
+
 rect:hover {
   fill: red;
 } 
+
 svg {
   margin:10px 0;
 }
+
 .states {
   fill: none;
   stroke: #fff;
   stroke-linejoin: round;
 }
+
 .axis path,
 .axis line {
   fill: none;
@@ -568,4 +573,9 @@ svg {
 
 #ex1, #ex2 {
   text-align:center;
+}
+
+#ex2 svg rect, 
+#scale {
+  cursor: pointer;
 }
