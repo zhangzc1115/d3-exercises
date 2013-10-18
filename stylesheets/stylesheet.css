@@ -488,9 +488,15 @@ Custom Styles
 #footnotes {
   font-size:12px;
 }
+
 .block {
   width:250px;
   float:left;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  -ms-transition: all 0.5s ease;
+  transition: all 0.5s ease;
 }
 
 .block circle {
@@ -507,12 +513,19 @@ Custom Styles
   height:25px;
   margin:10px 0 20px;   
 }
+
 #swap {
   font-family: 'Open Sans', sans-serif;
   border: 2px solid #393b79;
   padding: 7px 14px;
   margin: 10px 0;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
+
 #swap:hover {
   background-color:#393b79;
   color:white;

@@ -452,11 +452,13 @@ $(document).ready(function(){
 					return (d.students*.00000075) + .25;
 				});
 
-		//update key
-		d3.select("#color").selectAll("p").html(swapOrder[1]);
-		d3.select("#size").selectAll("p").html(swapOrder[2]);
-		d3.select("#opacity").selectAll("p").html(swapOrder[0]);
-
+				// update key
+				$(".block").fadeOut("400", function() {
+					d3.select("#color").selectAll("p").html(swapOrder[1]);
+					d3.select("#size").selectAll("p").html(swapOrder[2]);
+					d3.select("#opacity").selectAll("p").html(swapOrder[0]);
+				    $(this).fadeIn(400);
+				});
 		}
 
 		else if (count == 2) {
@@ -489,10 +491,13 @@ $(document).ready(function(){
 					return d.staff * .000005 + .25;
 				});
 
-			d3.select("#color").selectAll("p").html(swapOrder[2]);
-			d3.select("#size").selectAll("p").html(swapOrder[0]);
-			d3.select("#opacity").selectAll("p").html(swapOrder[1]);
-
+				$(".block").fadeOut("400", function() {
+					// update key
+					d3.select("#color").selectAll("p").html(swapOrder[2]);
+					d3.select("#size").selectAll("p").html(swapOrder[0]);
+					d3.select("#opacity").selectAll("p").html(swapOrder[1]);
+				    $(this).fadeIn(400);
+				});
 		}
 
 		// return back to first state
@@ -533,9 +538,13 @@ $(document).ready(function(){
 					return d.ratio*.05;
 				});
 
-			d3.select("#color").selectAll("p").html(swapOrder[0]);
-			d3.select("#size").selectAll("p").html(swapOrder[1]);
-			d3.select("#opacity").selectAll("p").html(swapOrder[2]);
+				$(".block").fadeOut("400", function() {
+					//update key
+					d3.select("#color").selectAll("p").html(swapOrder[0]);
+					d3.select("#size").selectAll("p").html(swapOrder[1]);
+					d3.select("#opacity").selectAll("p").html(swapOrder[2]);
+				    $(this).fadeIn(400);
+				});
 
 			//reset count
 			count = 0;
